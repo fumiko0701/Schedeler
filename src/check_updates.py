@@ -1,41 +1,46 @@
-import requests
-import zipfile
+import json
 import os
+import requests
+from dotenv import load_dotenv
+from colorama import init, Fore
 
-def check_for_updates():
+# Inicializa o colorama
+init(autoreset=True)
+
+def load_config():
+    with open('config.json') as config_file:
+        return json.load(config_file)
+
+def check_for_updates(current_version):
+    load_dotenv()  # Carrega variáveis de ambiente do arquivo .env
+    token = os.getenv('GITHUB_TOKEN')  # Substitua pelo nome da variável de ambiente que contém seu token
     repo_url = 'https://api.github.com/repos/escmidadtab/Schedeler/releases/latest'
-    response = requests.get(repo_url)
     
-    if response.status_code != 200:
-        print("Erro ao acessar o repositório.")
-        return
+    headers = {
+        'Authorization': f'token {token}',  # Autenticação com o token
+        'Accept': 'application/vnd.github.v3+json',
+    }
     
-    latest_release = response.json()
-    latest_version = latest_release['tag_name']
-    
-    # Compare com a versão atual
-    current_version = 'v1.0.0'  # Atualize isso sempre que fizer uma nova versão
-    
-    if latest_version != current_version:
-        print(f"Atualização disponível: {latest_version}")
-        
-        # Baixar o arquivo zip da versão mais recente
-        for asset in latest_release['assets']:
-            if asset['name'].endswith('.zip'):
-                download_url = asset['url']
-                headers = {'Accept': 'application/octet-stream'}
-                download_response = requests.get(download_url, headers=headers)
-                
-                with open(f'{latest_version}.zip', 'wb') as f:
-                    f.write(download_response.content)
-                    
-                print("Atualização baixada.")
-                
-                # Lógica para extrair o zip (se necessário)
-                # with zipfile.ZipFile(f'{latest_version}.zip', 'r') as zip_ref:
-                #     zip_ref.extractall('diretorio_de_destino')
+    response = requests.get(repo_url, headers=headers)
 
-                # Lógica para instalação pode ir aqui
-                break
+    if response.status_code == 200:
+        latest_version = response.json()['tag_name']
+        if latest_version != current_version:
+            # Exibe a versão atual em vermelho e a nova versão em verde
+            print(f"Atualização disponível: {Fore.GREEN}{latest_version}{Fore.RESET} (Versão atual: {Fore.RED}{current_version}{Fore.RESET})")
+            return True
     else:
-        print("Seu programa está atualizado.")
+        print(f"Erro ao acessar o repositório: {response.status_code}")
+    return False
+
+def prompt_for_update():
+    config = load_config()
+    current_version = config['version']
+
+    if check_for_updates(current_version):
+        download_update = input("Você gostaria de baixar a atualização? (s/n): ")
+        if download_update.lower() == 's':
+            print("Baixando atualização...")
+            # Lógica para baixar e instalar a atualização
+        else:
+            print("Atualização não baixada.")
