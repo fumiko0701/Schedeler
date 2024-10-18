@@ -1,0 +1,5 @@
+pyinstaller --noconsole --onefile seu_programa.py
+
+Isso vai garantir que o terminal não apareça até você manualmente exibi-lo via código.
+
+atraves da CTYPES ESTOU MANIPULANDO VISIBILIDADE DO CONSOLE MANUALMENTE NOS TEMPOS NECESSARIOS

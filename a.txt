@@ -1,0 +1,1 @@
+pyinstaller --onefile --add-data "config.json;." --add-data ".env;." --add-data "assets;assets" --hidden-import "dotenv" --hidden-import "colorama" --name "Schedeler" --noconsole main.py
