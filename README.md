@@ -39,8 +39,6 @@ Certifique-se de ter os seguintes requisitos instalados:
     GITHUB_TOKEN=seu_token_aqui
     ```
 
-2. Verifique e ajuste as configurações no arquivo [`config.json`](config.json) conforme necessário.
-
 ## Execução
 
 Para executar a aplicação, use o seguinte comando:
